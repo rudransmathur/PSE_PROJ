@@ -1,0 +1,262 @@
+.teacher-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 2px solid #ececec;
+  padding: 12px 32px 12px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.teacher-logo {
+  font-size: 1.5rem;
+  margin-right: 12px;
+}
+.teacher-title {
+  font-size: 1.15rem;
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+}
+.switch-role-btn {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.switch-role-btn:hover {
+  box-shadow: 0 2px 8px rgba(34,34,59,0.08);
+}
+
+.teacher-dashboard {
+  max-width: 900px;
+  margin: 32px auto 0 auto;
+  background: transparent;
+  padding: 0 0 32px 0;
+}
+.dashboard-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+.dashboard-desc {
+  text-align: center;
+  color: #666;
+  margin-bottom: 24px;
+}
+.tab-bar {
+  display: flex;
+  background: #f3f4f6;
+  border-radius: 16px;
+  margin: 0 auto 32px auto;
+  max-width: 900px;
+  overflow: hidden;
+}
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 0;
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: #222;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.tab-btn.active {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 2px 8px rgba(34,34,59,0.04);
+}
+.tab-content {
+  margin-top: 0;
+}
+.tab-panel {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(34,34,59,0.06);
+  padding: 32px 32px 24px 32px;
+  margin: 0 auto 32px auto;
+  max-width: 700px;
+}
+.question-form, .test-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group label {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #222;
+}
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+  outline: 2px solid #4f8cff;
+}
+.radio-group {
+  display: flex;
+  gap: 18px;
+  margin-top: 4px;
+}
+.radio-group label {
+  font-weight: 400;
+  color: #222;
+  font-size: 1rem;
+}
+.add-question-btn, .generate-test-btn {
+  background: #11111a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1.08rem;
+  font-weight: 600;
+  margin-top: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.add-question-btn:hover, .generate-test-btn:hover {
+  background: #22223b;
+}
+.question-bank-list, .generated-tests-list {
+  margin-top: 32px;
+}
+.question-bank-list ul, .generated-tests-list ul, .results-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.question-bank-list li, .generated-tests-list li, .results-list li {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+.test-status {
+  background: #ececec;
+  color: #444;
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 0.92rem;
+  margin-left: 8px;
+}
+.results-list {
+  margin-top: 24px;
+}
+/* Styles for Figma UI Clone */
+body {
+  margin: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  background: #f8f9fb;
+  color: #222;
+}
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fb;
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111;
+  text-align: center;
+}
+.login-subtitle {
+  color: #444;
+  font-size: 1.08rem;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.role-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.role-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(34,34,59,0.06);
+  padding: 32px 48px 24px 48px;
+  min-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.role-card:hover {
+  box-shadow: 0 6px 24px rgba(34,34,59,0.10);
+  transform: translateY(-2px) scale(1.02);
+}
+.role-icon {
+  margin-bottom: 12px;
+}
+.teacher-icon svg circle {
+  fill: #e6edfe;
+}
+.teacher-icon svg path {
+  fill: #4f8cff;
+}
+.student-icon svg circle {
+  fill: #e6fef3;
+}
+.student-icon svg path {
+  fill: #2ecc71;
+}
+.role-label {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #222;
+}
+.role-desc {
+  color: #666;
+  font-size: 0.98rem;
+  text-align: center;
+  max-width: 220px;
+}

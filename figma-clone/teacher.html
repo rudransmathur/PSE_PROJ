@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="teacher-header">
+    <span class="teacher-logo">📝</span>
+    <span class="teacher-title">Online MCQ System - Teacher Dashboard</span>
+    <button class="switch-role-btn" onclick="window.location.href='index.html'">Switch Role</button>
+  </div>
+  <div class="teacher-dashboard">
+    <h2 class="dashboard-title">Teacher Dashboard</h2>
+    <p class="dashboard-desc">Manage questions, generate tests, and view student results</p>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="questions"><span>⚪</span> Create Questions</button>
+      <button class="tab-btn" data-tab="tests"><span>📄</span> Generate Test Papers</button>
+      <button class="tab-btn" data-tab="results"><span>📊</span> View Results</button>
+    </div>
+    <div class="tab-content">
+      <div class="tab-panel" id="tab-questions">
+        <!-- Create Questions Form -->
+      </div>
+      <div class="tab-panel" id="tab-tests" style="display:none">
+        <!-- Generate Test Papers -->
+      </div>
+      <div class="tab-panel" id="tab-results" style="display:none">
+        <!-- View Results -->
+      </div>
+    </div>
+  </div>
+  <script src="teacher.js"></script>
+</body>
+</html>
