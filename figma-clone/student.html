@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="teacher-header">
+    <span class="teacher-logo">📝</span>
+    <span class="teacher-title">Online MCQ System - Student Dashboard</span>
+    <button class="switch-role-btn" onclick="window.location.href='index.html'">Switch Role</button>
+  </div>
+  <div class="teacher-dashboard">
+    <h2 class="dashboard-title">Student Dashboard</h2>
+    <p class="dashboard-desc">Take available tests and view your scores</p>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="take-tests"><span>🖥️</span> Take Tests</button>
+      <button class="tab-btn" data-tab="view-scores"><span>🏆</span> View Scores</button>
+    </div>
+    <div class="tab-content">
+      <div class="tab-panel" id="tab-take-tests">
+        <!-- Available Tests -->
+      </div>
+      <div class="tab-panel" id="tab-view-scores" style="display:none">
+        <!-- Student Results -->
+      </div>
+    </div>
+  </div>
+  <script src="student.js"></script>
+</body>
+</html>
