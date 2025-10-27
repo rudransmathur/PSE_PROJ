@@ -1,79 +1,166 @@
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import path from 'path';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
 const app = express();
-const PORT = 3001;
-
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Open SQLite DB
+const DB_PATH = path.join(process.cwd(), 'mcq.db');
+
 let db;
-(async () => {
-  db = await open({
-    filename: './mcq.db',
-    driver: sqlite3.Database
-  });
-  // Create tables if not exist
+async function initDb() {
+  db = await open({ filename: DB_PATH, driver: sqlite3.Database });
+
+  // create tables if they don't exist (safe)
   await db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE,
-      password_hash TEXT,
-      role TEXT
-    );
     CREATE TABLE IF NOT EXISTS questions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      subject TEXT,
-      difficulty TEXT,
-      question_text TEXT,
-      option1 TEXT,
-      option2 TEXT,
-      option3 TEXT,
-      option4 TEXT,
-      correct_option INTEGER,
-      created_by INTEGER
-    );
-    CREATE TABLE IF NOT EXISTS tests (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT,
-      subject TEXT,
-      date_created TEXT,
-      duration INTEGER,
-      difficulty TEXT,
-      created_by INTEGER,
-      status TEXT
-    );
-    CREATE TABLE IF NOT EXISTS test_questions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      test_id INTEGER,
-      question_id INTEGER
-    );
-    CREATE TABLE IF NOT EXISTS submissions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      test_id INTEGER,
-      student_id INTEGER,
-      date_submitted TEXT,
-      score INTEGER
-    );
-    CREATE TABLE IF NOT EXISTS submission_answers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      submission_id INTEGER,
-      question_id INTEGER,
-      selected_option INTEGER,
-      is_correct BOOLEAN
+      id INTEGER PRIMARY KEY AUTOINCREMENT
     );
   `);
-  console.log('Database initialized');
-})();
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS tests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT
+    );
+  `);
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS results (
+      id INTEGER PRIMARY KEY AUTOINCREMENT
+    );
+  `);
 
-app.get('/', (req, res) => {
-  res.send('MCQ Backend Running');
+  // helper that ensures required columns exist on a table (adds missing via ALTER TABLE)
+  async function ensureColumns(table, requiredColumns) {
+    const existing = await db.all(`PRAGMA table_info('${table}')`);
+    const names = existing.map(r => r.name);
+    for (const col of requiredColumns) {
+      if (!names.includes(col.name)) {
+        console.log(`Adding column ${col.name} to ${table}`);
+        await db.exec(`ALTER TABLE ${table} ADD COLUMN ${col.name} ${col.type}`);
+      }
+    }
+  }
+
+  // required columns for questions/tests/results
+  await ensureColumns('questions', [
+    { name: 'subject', type: 'TEXT' },
+    { name: 'difficulty', type: 'TEXT' },
+    { name: 'question', type: 'TEXT' },
+    { name: 'option1', type: 'TEXT' },
+    { name: 'option2', type: 'TEXT' },
+    { name: 'option3', type: 'TEXT' },
+    { name: 'option4', type: 'TEXT' },
+    { name: 'answer', type: 'INTEGER' },
+    { name: 'created_at', type: "TEXT DEFAULT (datetime('now'))" }
+  ]);
+
+  await ensureColumns('tests', [
+    { name: 'title', type: 'TEXT' },
+    { name: 'subject', type: 'TEXT' },
+    { name: 'duration', type: 'INTEGER' },
+    { name: 'questions', type: 'INTEGER' },
+    { name: 'difficulty', type: 'TEXT' },
+    { name: 'status', type: 'TEXT' },
+    { name: 'created_at', type: "TEXT DEFAULT (datetime('now'))" }
+  ]);
+
+  await ensureColumns('results', [
+    { name: 'student', type: 'TEXT' },
+    { name: 'test', type: 'TEXT' },
+    { name: 'score', type: 'REAL' },
+    { name: 'data', type: 'TEXT' },
+    { name: 'date', type: "TEXT DEFAULT (datetime('now'))" }
+  ]);
+
+  console.log('Opened DB at', DB_PATH);
+}
+
+initDb().catch(err => {
+  console.error('Failed to open DB', err);
+  process.exit(1);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// --- Questions ---
+app.get('/api/questions', async (req, res) => {
+  try {
+    const rows = await db.all('SELECT * FROM questions ORDER BY id DESC');
+    res.json(rows || []);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'failed to read questions' });
+  }
 });
+
+app.post('/api/questions', async (req, res) => {
+  try {
+    const { subject = '', difficulty = '', question = '', option1 = '', option2 = '', option3 = '', option4 = '', answer = 0 } = req.body;
+    const result = await db.run(
+      `INSERT INTO questions (subject, difficulty, question, option1, option2, option3, option4, answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      subject, difficulty, question, option1, option2, option3, option4, answer
+    );
+    const row = await db.get('SELECT * FROM questions WHERE id = ?', result.lastID);
+    res.status(201).json(row);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'failed to insert question' });
+  }
+});
+
+// --- Tests ---
+app.get('/api/tests', async (req, res) => {
+  try {
+    const rows = await db.all('SELECT * FROM tests ORDER BY id DESC');
+    res.json(rows || []);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'failed to read tests' });
+  }
+});
+
+app.post('/api/tests', async (req, res) => {
+  try {
+    const { title = '', subject = '', duration = 0, questions = 0, difficulty = '', status = 'draft' } = req.body;
+    const result = await db.run(
+      `INSERT INTO tests (title, subject, duration, questions, difficulty, status) VALUES (?, ?, ?, ?, ?, ?)`,
+      title, subject, duration, questions, difficulty, status
+    );
+    const row = await db.get('SELECT * FROM tests WHERE id = ?', result.lastID);
+    res.status(201).json(row);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'failed to insert test' });
+  }
+});
+
+// --- Results ---
+app.get('/api/results', async (req, res) => {
+  try {
+    const rows = await db.all('SELECT * FROM results ORDER BY id DESC');
+    res.json(rows || []);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'failed to read results' });
+  }
+});
+
+app.post('/api/results', async (req, res) => {
+  try {
+    const { student = '', test = '', score = 0, data = null } = req.body;
+    const result = await db.run(
+      `INSERT INTO results (student, test, score, data) VALUES (?, ?, ?, ?)`,
+      student, test, score, data ? JSON.stringify(data) : null
+    );
+    const row = await db.get('SELECT * FROM results WHERE id = ?', result.lastID);
+    res.status(201).json(row);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'failed to insert result' });
+  }
+});
+
+app.get('/', (req, res) => res.json({ ok: true }));
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Backend listening on http://localhost:${PORT}`));
